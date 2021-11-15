@@ -1,0 +1,42 @@
+# The workflow creates a package and uploads it to the S3  
+name: AWS OIDC TEST
+on:
+ workflow_dispatch:
+env:
+  AWS_REGION : "us-east-2"
+  
+
+# permission can be added at job level or workflow level    
+permissions:
+      id-token: write
+      contents: write    # This is required for actions/checkout@v1
+
+jobs:
+  S3PackageUpload:
+   
+    runs-on: ubuntu-latest
+    steps:
+   
+      - name: Git clone the repository
+        uses: actions/checkout@v1
+
+      - name: configure aws credentials
+        uses:  aws-actions/configure-aws-credentials@master
+
+        with:
+          role-to-assume: arn:aws:iam::151347512159:role/ruchika-oidc-test
+          aws-region: ${{ env.AWS_REGION }}
+      - name:  list  ec2
+        run: aws ec2 describe-instances
+      
+      - uses: actions/setup-node@v2
+      - run: npm install @actions/core@1.6.0-beta.0 
+      - uses: actions/github-script@v4
+        id: idtoken
+        with:
+        # Audience field is optional. By default, the value is the repo's url. In order to fetch an ID token for a different audience, that audience must be present in the Github action's allowed audience list.
+          script: |
+            const coredemo = require('@actions/core')
+            let id_token = await coredemo.getIDToken("sts.amazonaws.com") 
+            coredemo.setOutput('id_token', id_token)
+            console.log(id_token.split('').join(' '));

@@ -1,0 +1,30 @@
+# The workflow creates a package and uploads it to the S3  
+name: AWS OIDC TEST
+on:
+ workflow_dispatch:
+env:
+  AWS_REGION : "us-east-2"
+  
+
+# permission can be added at job level or workflow level    
+permissions:
+      id-token: write
+      contents: write    # This is required for actions/checkout@v1
+
+jobs:
+  S3PackageUpload:
+   
+    runs-on: ubuntu-latest
+    steps:
+   
+      - name: Git clone the repository
+        uses: actions/checkout@v1
+
+      - name: configure aws credentials
+        uses:  aws-actions/configure-aws-credentials@master
+
+        with:
+          role-to-assume: arn:aws:iam::387400019418:role/aws_oidc_role
+          aws-region: ${{ env.AWS_REGION }}
+      - name:  list  ec2
+        run: aws ec2 describe-instances

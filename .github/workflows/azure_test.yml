@@ -1,0 +1,41 @@
+# Sample workflow to access azure resources using oidc 
+name: Run login action with OIDC
+
+# Controls when the workflow will run 
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# permission can be added at job level or workflow level    
+permissions:
+  id-token: write
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+
+  
+    - name: Installing CLI-beta for OIDC
+      run: |
+         CWD="$(pwd)"  
+         python3 -m venv oidc-venv
+         . oidc-venv/bin/activate
+         echo "activated environment" 
+         python3 -m pip install -q --upgrade pip
+         echo "started installing cli beta" 
+         pip install -q --extra-index-url https://azcliprod.blob.core.windows.net/beta/simple/ azure-cli 
+         echo "***************installed cli beta*******************" 
+         echo "$CWD/oidc-venv/bin" >> $GITHUB_PATH
+         
+    - name: 'Az CLI login'
+      uses: 'azure/login@oidc-support'
+      with:
+        client-id: cc6dcee2-1e86-4694-a74f-f43c01f3fb76
+        tenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+        allow-no-subscriptions: true
+        
+    - name: 'Run az commands'
+      run: |
+          az account show

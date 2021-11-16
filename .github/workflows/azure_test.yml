@@ -30,7 +30,7 @@ jobs:
          echo "$CWD/oidc-venv/bin" >> $GITHUB_PATH
          
     - name: 'Az CLI login'
-      uses: 'azure/login@oidc-support'
+      uses: 'azure/login@v1.4.0'
       with:
         client-id: cc6dcee2-1e86-4694-a74f-f43c01f3fb76
         tenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
